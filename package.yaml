@@ -1,0 +1,114 @@
+name:    free-yesod
+version: "0.0.0"
+
+default-extensions:
+  - DataKinds
+  - FlexibleContexts
+  - GADTs
+  - LambdaCase
+  - PolyKinds
+  - RankNTypes
+  - ScopedTypeVariables
+  - TypeApplications
+  - TypeOperators
+  - TypeFamilies
+
+dependencies:
+
+- base
+- yesod
+- yesod-core
+- yesod-auth
+- yesod-static
+- yesod-form
+- classy-prelude
+- classy-prelude-conduit
+- classy-prelude-yesod
+- bytestring
+- text
+- persistent
+- persistent-sqlite
+- persistent-template
+- template-haskell
+- shakespeare
+- hjsmin
+- monad-control
+- wai-extra
+- yaml
+- http-client-tls
+- http-conduit
+- directory
+- warp
+- data-default
+- aeson
+- conduit
+- monad-logger
+- fast-logger
+- wai-logger
+- file-embed
+- safe
+- unordered-containers
+- containers
+- vector
+- time
+- case-insensitive
+- wai
+- foreign-store
+- freer-simple
+
+# The library contains all of our application code. The executable
+# defined below is just a thin wrapper.
+library:
+  source-dirs: src
+  when:
+  - condition: (flag(dev)) || (flag(library-only))
+    then:
+      ghc-options:
+      - -Wall
+      - -fwarn-tabs
+      - -O0
+      cpp-options: -DDEVELOPMENT
+    else:
+      ghc-options:
+      - -Wall
+      - -fwarn-tabs
+      - -O2
+
+# Runnable executable for our application
+executables:
+  free-yesod:
+    main: main.hs
+    source-dirs: app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -O2
+    dependencies:
+    - free-yesod
+    when:
+    - condition: flag(library-only)
+      buildable: false
+
+# Test suite
+tests:
+  free-yesod-test:
+    main: Spec.hs
+    source-dirs: test
+    ghc-options: -Wall
+    dependencies:
+    - free-yesod
+    - hspec >=2.0.0
+    - yesod-test
+    - microlens
+
+# Define flags used by "yesod devel" to make compilation faster
+flags:
+  library-only:
+    description: Build for use with "yesod devel"
+    manual: false
+    default: false
+  dev:
+    description: Turn on development settings, like auto-reload templates.
+    manual: false
+    default: false
